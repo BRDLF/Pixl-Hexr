@@ -123,7 +123,6 @@ class gui{
         testFrame.setContentPane(allPanel);
         testFrame.setResizable(true);
 
-
         // testFrame.setMinimumSize(new DimensionUIResource(640,480));        
         testFrame.setLocationRelativeTo(null);
         testFrame.pack();

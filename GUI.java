@@ -52,7 +52,7 @@ class gui{
         GridLayout viewGridLayout = new GridLayout(gridrow, gridcol);
         centralPanel.setLayout(viewGridLayout);
         viewGridLayout.setHgap(1); viewGridLayout.setVgap(1);
-        centralPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        centralPanel.setBorder(topPanel.getBorder());
         
         JToggleButton c1[] = new JToggleButton[gridrow*gridcol];
         for(int n = 0; n < gridrow*gridcol; n++){
@@ -82,7 +82,7 @@ class gui{
         botPanel.add(updateButton, b);
         b.gridx = 1; b.gridy = 1;
         botPanel.add(new JLabel(" "), b);
-        botPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        botPanel.setBorder(topPanel.getBorder());
 
         JPanel allPanel = new JPanel();
         allPanel.setLayout(new GridBagLayout());
@@ -99,11 +99,9 @@ class gui{
         c.weightx = 0; c.weighty = 0;
         allPanel.add(leftPanel, c);
 
-        c.fill = GridBagConstraints.NONE;
+        c.fill = GridBagConstraints.BOTH;
         c.gridy = 1; c.gridx = 1;
         c.weightx = 0; c.weighty = 0;
-        // c.insets = new Insets(2, 2, 2, 2);
-        // c.anchor = GridBagConstraints.CENTER;
         allPanel.add(centralPanel, c);
 
         c.fill = GridBagConstraints.BOTH;

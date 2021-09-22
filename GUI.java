@@ -74,12 +74,15 @@ class gui{
         JButton updateButton = new JButton("Update");
         updateButton.setSize(120, 24);
         GridBagConstraints b = new GridBagConstraints();
-        b.gridx = 0; b.gridy = 0;
-        b.weightx = .5;
-        b.anchor = GridBagConstraints.FIRST_LINE_END;
-        botPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        botPanel.add(updateButton, b);
         
+        b.weightx = 1; b.weighty = 1;
+        botPanel.add(new JLabel(" "));
+        b.gridx = 1;
+        b.anchor = GridBagConstraints.FIRST_LINE_END;
+        botPanel.add(updateButton, b);
+        b.gridx = 1; b.gridy = 1;
+        botPanel.add(new JLabel(" "), b);
+        botPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         JPanel allPanel = new JPanel();
         allPanel.setLayout(new GridBagLayout());
@@ -100,7 +103,7 @@ class gui{
         c.gridy = 1; c.gridx = 1;
         c.weightx = 0; c.weighty = 0;
         // c.insets = new Insets(2, 2, 2, 2);
-        c.anchor = GridBagConstraints.CENTER;
+        // c.anchor = GridBagConstraints.CENTER;
         allPanel.add(centralPanel, c);
 
         c.fill = GridBagConstraints.BOTH;
@@ -114,10 +117,9 @@ class gui{
         c.gridy = 2; c.gridx = 1;        
         c.gridwidth = 1; c.gridheight = 1;
         c.weightx = 0; c.weighty = 1;
-        c.anchor = GridBagConstraints.FIRST_LINE_END;
         allPanel.add(botPanel, c);
         
-        JFrame testFrame = new JFrame("my first frame");
+        JFrame testFrame = new JFrame("Pixl Hexr");
         testFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         testFrame.setContentPane(allPanel);

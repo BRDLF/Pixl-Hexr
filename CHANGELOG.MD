@@ -1,7 +1,4 @@
-How To Use:
-The top and left pane allows you to set the height and width of the array in the center.
-Turning the toggle buttons in the center on/off, and pressing the "Update" button in the bottom pane, will convert the array into hexcode.
-This makes writing to LED matrices much easier.
+v0.1
 
 Known Issues
 -Resizing frame will break fullscreen
@@ -9,4 +6,9 @@ Known Issues
 -Central grid clears on Frame change & on text update
 -64 Width arrays don't work right. Something to do with sign bits. Need to implement bitmath instead of addition of powers
 
-Thank you.
+Changes
+-Radio buttons now adjust height/width of the grid accordingly.
+-Update button stores central grid as series of hexcodes
+
+ToDo
+-Fix above bugs

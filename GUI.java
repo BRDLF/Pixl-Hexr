@@ -4,7 +4,7 @@ import java.awt.*;
 
 class gui extends JPanel implements ActionListener {
 
-    static String msg = new String("uintXX_t IMAGE[YY] =\n");
+    static String msg = new String("uintXX_t IMAGE[YY] = {\n");
     static int numby = 0x44;
     static int gridrow = 8;
     static int gridcol = 8;
@@ -91,7 +91,7 @@ class gui extends JPanel implements ActionListener {
         rightPanel.setMinimumSize(rightPanel.getSize());
 
         JPanel botPanel = new JPanel(new GridBagLayout());
-        JButton updateButton = new JButton("Update");
+        JButton updateButton = new JButton("Compute Hex");
         updateButton.setActionCommand("Update");
         updateButton.addActionListener(this);
         updateButton.setSize(120, 24);
@@ -204,14 +204,19 @@ class gui extends JPanel implements ActionListener {
 
     protected String computeHex(){
         long compInt[] = new long[gridrow];
-        int ch; int cw;
+        int ch; int cw; int cwi;
+        long addme;
         for(int cn = 0; cn < gridcol*gridrow; cn++){
             ch = cn/gridcol;
             cw = cn%gridcol;
+            cwi = gridcol -(cw+1);
             if(c1[cn].isSelected()){
-            compInt[ch] = compInt[ch] + (long)Math.pow(2, (gridcol - cw) - 1);
-            // compInt[ch] += 1<<((gridcol-cw)-1);
-            System.out.println(compInt[ch]);
+            addme = ((long)Math.pow(2, (cwi%4)))<<(4*(cwi/4));
+            compInt[ch] = compInt[ch] + addme;
+            // System.out.println("cwa = " + cwi);
+            // System.out.println("Makes 2^" + (cwi%4));
+            // System.out.println("Shifted "+4*(cwi/4)+" bits");
+            // System.out.println("Adds " + addme + " to CompInt[" + ch +"]" + " of " + compInt[ch]);
             }
         }
 
@@ -219,8 +224,9 @@ class gui extends JPanel implements ActionListener {
         StringBuilder sb = new StringBuilder(1200);
         String formatString = new String("%0" + Integer.toString(gridcol/4) + "x");
         for(int rs=0;rs < gridrow;rs++){
-            sb.append("0x" + String.format(formatString ,compInt[rs]).toUpperCase() + "\n");
+            sb.append("0x" + String.format(formatString ,compInt[rs]).toUpperCase() + ",\n");
         }
+        sb.append("};");
         compresults = sb.toString();
         return compresults;
     }

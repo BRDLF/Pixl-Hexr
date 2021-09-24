@@ -1,3 +1,16 @@
+v0.1.2
+
+Changes
+-Added memory: grid will now remember which buttons are selected between updates/gridsize changes
+-Added clear button: you can now clear entire grid with press of a button
+
+Known Issues
+-Resizing grid will break fullscreen
+-Enlarging frame does not update minimumsize (enfocing minimum size on gridchange prevents frame from shrinking.)
+
+ToDo
+-Fix auto-resizing issues
+
 v0.1.1
 
 Changes
@@ -5,9 +18,9 @@ Changes
 -Syntax of output fixed to represent valid C++
 
 Known Issues
--Resizing frame will break fullscreen
--Enlarging frame does not update minimumsize (enfocing minimum size on framechange prevents frame from shrinking.)
--Central grid clears on Frame change & on text update
+-Resizing grid will break fullscreen
+-Enlarging frame does not update minimumsize (enfocing minimum size on gridchange prevents frame from shrinking.)
+-Grid clears on Frame change & on text update
 
 ToDo
 -Fix auto-resizing issues

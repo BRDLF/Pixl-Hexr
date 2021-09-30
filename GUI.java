@@ -1,4 +1,5 @@
 import javax.swing.*;
+
 import java.awt.event.*;
 import java.awt.*;
 
@@ -9,6 +10,7 @@ class gui extends JPanel implements ActionListener {
     static int gridrow = 8;
     static int gridcol = 8;
     JToggleButton c1[] = new JToggleButton[64*64];
+    boolean gridmemory[] = new boolean[64*64];
     static String testString;
     JLabel botLabel = new JLabel();
     JPanel centralPanel = new JPanel();
@@ -16,7 +18,7 @@ class gui extends JPanel implements ActionListener {
     static JFrame toolFrame;
     static JTextArea results;
     static JScrollPane rightPanel;
-    // static boolean gridbool[] = new boolean[64*64];
+    static GridBagConstraints r;
 
     public gui() {
         super (new GridBagLayout());
@@ -85,7 +87,7 @@ class gui extends JPanel implements ActionListener {
         results.setLineWrap(true);
         results.setColumns(12);
         rightPanel.setBorder(topPanel.getBorder());
-        rightPanel.setMinimumSize(rightPanel.getSize());
+        // rightPanel.setMinimumSize(rightPanel.getSize());
 
         JPanel botPanel = new JPanel(new GridBagLayout());
         JButton updateButton = new JButton("Compute");
@@ -102,11 +104,13 @@ class gui extends JPanel implements ActionListener {
         b.anchor = GridBagConstraints.FIRST_LINE_END;
         b.gridx = 1;
         botPanel.add(updateButton, b);
+        b.gridy = 1;
+        botPanel.add(new JLabel("a"), b);
         
         
         botPanel.setBorder(topPanel.getBorder());
 
-        
+        //All Border Fill
         GridBagConstraints c = new GridBagConstraints();
 
         c.fill = GridBagConstraints.BOTH;
@@ -123,7 +127,7 @@ class gui extends JPanel implements ActionListener {
         c.fill = GridBagConstraints.NONE;
         c.anchor = GridBagConstraints.FIRST_LINE_START;
         c.gridy = 1; c.gridx = 1;
-        c.weightx = 0; c.weighty = 0;
+        // c.weightx = 1; c.weighty = 1;
         super.add(centralPanel, c);
 
         c.fill = GridBagConstraints.BOTH;
@@ -133,6 +137,7 @@ class gui extends JPanel implements ActionListener {
         c.weightx = 1; c.weighty = 1;
         c.insets = new Insets(0, 0, 0, 0);
         super.add(rightPanel, c);
+
 
         c.fill = GridBagConstraints.BOTH;
         c.gridy = 2; c.gridx = 1;        
@@ -174,37 +179,58 @@ class gui extends JPanel implements ActionListener {
             case "RBH64": 
             resizeGrid(gridcol, 64);
             break;
-            case "Update":
-            results.setText(msg.replace("XX", Integer.toString(gridcol)).replace("YY", Integer.toString(gridrow)) + computeHex());
-            break;
+            // case "Update":
+            // toolFrame.setMinimumSize(toolFrame.getSize());
+            // results.setText(msg.replace("XX", Integer.toString(gridcol)).replace("YY", Integer.toString(gridrow)) + computeHex());
+            // break;
             case "Clear":
             clearGrid();
             break;
             default:
             break;
         }
-
-        centralPanel.setLayout(new GridLayout(gridrow,gridcol, 1, 1));
-        toolFrame.pack();
+        results.setText(msg.replace("XX", Integer.toString(gridcol)).replace("YY", Integer.toString(gridrow)) + computeHex());
+        
+        
+        
+        // rightPanel.setSize(rightPanel.getPreferredSize());
         // toolFrame.setMinimumSize(toolFrame.getSize());
     }
 
     private void resizeGrid(int nW, int nH){
+        // System.out.println("Resizing from " + gridcol + " to " + nW + " and from " + gridrow + " to " + nH);
         boolean gridbool[] = new boolean[64*64];
         int tW; int tH;
         int p;
         for (int n = 0; n < gridcol*gridrow; n++){
-            if (c1[n].isSelected()){
+        
                 tW = n%gridcol;
                 tH = n/gridcol;
-                p = (tH*nW) + tW;
+                p = (tH*64) + tW;
                 // p = (((n/gridcol)*nW) + (n%gridcol));
-                if (tW >= nW) {
+                if (tW >= 64) {
                     continue;
                 }
-                gridbool[p] = true; 
+                if (gridmemory[p] != c1[n].isSelected()){
+                gridmemory[p] = c1[n].isSelected(); 
+                // System.out.println("n = " + n + " and p = " + p);
+                // System.out.println("c1[n] = " + c1[n].isSelected());
+                }
+        }
+
+        for (int m = 0; m < 64*64; m++){
+            if(gridmemory[m]){
+                tW = m%64;
+                tH = m/64;
+                p = (tH*nW) + tW;
+                if (tW >= nW){
+                    continue;
+                }
+                gridbool[p] = true;
+                // System.out.println("m = " + m + " and p = " + p);
             }
         }
+
 
         gridcol = nW;
         gridrow = nH;
@@ -217,11 +243,22 @@ class gui extends JPanel implements ActionListener {
             c1[n].setPreferredSize(buttoDimension);
             centralPanel.add(c1[n]);
         }
+        centralPanel.setLayout(new GridLayout(gridrow,gridcol, 1, 1));
+        results.setRows(nH + 2);
+        //if not Maximized
+        toolFrame.setMinimumSize(new Dimension(100,100));
+        toolFrame.pack();
+        toolFrame.setMinimumSize(toolFrame.getSize());
+        toolFrame.setVisible(true);
+        
     }
 
     void clearGrid(){
         for(int n = 0; n < gridcol*gridrow; n++){
             c1[n].setSelected(false);
+        }
+        for(int n = 0; n < 64*64; n++){
+            gridmemory[n] = false;
         }
     }
     
@@ -243,15 +280,16 @@ class gui extends JPanel implements ActionListener {
         toolFrame.setContentPane(newContentPane);
         toolFrame.setLocationRelativeTo(null);
         toolFrame.pack();
-        // rightPanel.setPreferredSize(rightPanel.getSize());
-        toolFrame.setMinimumSize(toolFrame.getSize());
         toolFrame.setVisible(true);
+        // toolFrame.setPreferredSize(toolFrame.getSize());
+        toolFrame.setMinimumSize(toolFrame.getSize());
     }
 
     protected String computeHex(){
         long compInt[] = new long[gridrow];
         int ch; int cw; int cwi;
         long addme;
+
         for(int cn = 0; cn < gridcol*gridrow; cn++){
             ch = cn/gridcol;
             cw = cn%gridcol;

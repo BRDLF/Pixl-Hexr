@@ -1,3 +1,8 @@
+EXPERIMENTAL BUILD
+
+Trying to fix issues with resizing, maximizing/unmaximizing.
+Currently, enlarging window updates minsize
+
 v0.1.2
 
 Changes

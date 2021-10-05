@@ -3,26 +3,34 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
-class gui extends JPanel implements ActionListener {
+// Kirk: Always name your classes PascalCase rather than c_names in Java.
+class PHGui extends JPanel implements ActionListener {
 
+    static final int gridMaxSize = 64*64;
     static String msg = new String("uintXX_t IMAGE[YY] = {\n");
-    static int numby = 0x44;
     static int gridrow = 8;
     static int gridcol = 8;
-    JToggleButton c1[] = new JToggleButton[64*64];
-    boolean gridmemory[] = new boolean[64*64];
+    JToggleButton c1[] = new JToggleButton[gridMaxSize]; // Kirk: Define 64x64 as a const with a significant name, like MAX_GRID_SIZE
+    boolean gridmemory[] = new boolean[gridMaxSize]; // see above
     static String testString;
     JLabel botLabel = new JLabel();
+    JScrollPane centralzone;
     JPanel centralPanel = new JPanel();
     Dimension buttoDimension = new Dimension(14,14);
     static JFrame toolFrame;
     static JTextArea results;
     static JScrollPane rightPanel;
     static GridBagConstraints r;
+    
 
-    public gui() {
+    public PHGui() {
         super (new GridBagLayout());
 
+        // Kirk: If you might like to adjust these values, consider using a const array, such as X_WIDTH = [8,16,32,64]
+        // Then use a loop to initialize these. When you need to add or remove one, it's all done in one place. It also cuts down
+        // on program length, which helps others understand your program more clearly.
+
+        // Kirk: Consider grouping these methods into initialization methods that describe your actions, similar to your main program.
         JRadioButton RBW8 = new JRadioButton("8", true); 
         RBW8.setActionCommand("RBW8");
         JRadioButton RBW16 = new JRadioButton("16");
@@ -66,7 +74,7 @@ class gui extends JPanel implements ActionListener {
 
         JPanel leftPanel = new JPanel(new GridBagLayout());
         GridBagConstraints l = new GridBagConstraints();
-        l.gridx = 0; l.gridy = 0; l.anchor = GridBagConstraints.WEST;
+        l.gridx = 0; l.gridy = 0; l.anchor = GridBagConstraints.WEST; // Kirk: Pretty common in c, less common in Java. No issues tho.
         leftPanel.add(new JLabel("Set Height\n"), l); l.gridy = 1;
         leftPanel.add(RBH8, l); l.gridy = 2;
         leftPanel.add(RBH16, l); l.gridy=3;
@@ -74,6 +82,7 @@ class gui extends JPanel implements ActionListener {
         leftPanel.add(RBH64, l);
         leftPanel.setBorder(topPanel.getBorder());
         
+        centralzone = new JScrollPane(centralPanel);
         centralPanel.setLayout(new GridLayout(gridrow, gridcol, 1, 1));
         centralPanel.setBorder(topPanel.getBorder());
         
@@ -148,11 +157,13 @@ class gui extends JPanel implements ActionListener {
         
     }
 
+    // Kirk: Rename this to a significant action name. That way when you add the function as an action, it is clearer.
     public void actionPerformed(ActionEvent e){
         botLabel.setText(e.getActionCommand());
 
         String Source = e.getActionCommand();
 
+        // Kirk: Yay switches :3
         switch (Source){
 
             case "RBW8":
@@ -197,8 +208,11 @@ class gui extends JPanel implements ActionListener {
         // toolFrame.setMinimumSize(toolFrame.getSize());
     }
 
+    // Kirk: Unit testing :3
     private void resizeGrid(int nW, int nH){
         // System.out.println("Resizing from " + gridcol + " to " + nW + " and from " + gridrow + " to " + nH);
+
+        // Kirk: This is where naming a const would help; someone might not change this value if they wanted to make it 128x128 instead.
         boolean gridbool[] = new boolean[64*64];
         int tW; int tH;
         int p;
@@ -208,7 +222,7 @@ class gui extends JPanel implements ActionListener {
                 tH = n/gridcol;
                 p = (tH*64) + tW;
                 // p = (((n/gridcol)*nW) + (n%gridcol));
-                if (tW >= 64) {
+                if (tW >= 64) { // Kirk: nitpicky, but feels like this boolean should be inverted and include the below functions.
                     continue;
                 }
                 if (gridmemory[p] != c1[n].isSelected()){
@@ -245,7 +259,8 @@ class gui extends JPanel implements ActionListener {
         }
         centralPanel.setLayout(new GridLayout(gridrow,gridcol, 1, 1));
         results.setRows(nH + 2);
-        //if not Maximized
+        //TODO:if not Maximized
+        //  IDE's will group these together
         toolFrame.setMinimumSize(new Dimension(100,100));
         toolFrame.pack();
         toolFrame.setMinimumSize(toolFrame.getSize());
@@ -253,16 +268,20 @@ class gui extends JPanel implements ActionListener {
         
     }
 
-    void clearGrid(){
+    // Kirk: An alternative way to implement this is to re-initialize the gridmemory function, and then "sync" the UI.
+    //  Having a UI-sync method can be VERY helpful to call after every update to the backend data structures.
+    private void clearGrid(){
         for(int n = 0; n < gridcol*gridrow; n++){
             c1[n].setSelected(false);
         }
+        // Kirk: This is where a constant I mentioned at the top would help.
         for(int n = 0; n < 64*64; n++){
             gridmemory[n] = false;
         }
     }
     
-    void makeGrid(){
+    // Kirk: This is a great method; this is more of the ideal for a Java program I'd suggest.
+    private void makeGrid(){
         centralPanel.removeAll();
         for(int n = 0; n < gridcol*gridrow; n++){
             c1[n] = new JToggleButton();
@@ -275,7 +294,7 @@ class gui extends JPanel implements ActionListener {
         toolFrame = new JFrame("Pixl Hexr");
         toolFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         toolFrame.setResizable(true);
-        JComponent newContentPane = new gui();
+        JComponent newContentPane = new PHGui();
         newContentPane.setOpaque(true);
         toolFrame.setContentPane(newContentPane);
         toolFrame.setLocationRelativeTo(null);
@@ -285,6 +304,7 @@ class gui extends JPanel implements ActionListener {
         toolFrame.setMinimumSize(toolFrame.getSize());
     }
 
+    // Kirk: Unit testing! :3
     protected String computeHex(){
         long compInt[] = new long[gridrow];
         int ch; int cw; int cwi;
@@ -314,6 +334,7 @@ class gui extends JPanel implements ActionListener {
         compresults = sb.toString();
         return compresults;
     }
+
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater (new Runnable() {
             public void run() {
@@ -322,3 +343,6 @@ class gui extends JPanel implements ActionListener {
         });
     }
 }
+
+// Kirk: final comment. Consider refactoring out the UI from the backend data structure into separate files.
+//  Use a sync method that accepts the backend data structure to update the UI accordingly.

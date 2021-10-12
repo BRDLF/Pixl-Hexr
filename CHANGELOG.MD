@@ -1,6 +1,6 @@
 ## v0.1.2
 
-##### Changes
+#### Changes
 -Added memory: grid will now remember which buttons are selected between updates/gridsize changes
 -Added clear button: you can now clear entire grid with press of a button
 

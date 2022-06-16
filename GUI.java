@@ -4,19 +4,17 @@ import java.awt.*;
 
 class gui extends JPanel implements ActionListener {
 
-    static String msg = new String("uintXX_t IMAGE[YY] = {\n");
-    static int numby = 0x44;
-    static int gridrow = 8;
-    static int gridcol = 8;
-    JToggleButton c1[] = new JToggleButton[64*64];
-    static String testString;
+    static final Dimension buttonDimension = new Dimension(14,14);
+    static String msg = "uIntXX_t IMAGE[YY] = {\n";
+    static int gridRow = 8;
+    static int gridCol = 8;
+    JToggleButton[] jToggleButtons = new JToggleButton[64*64];
     JLabel botLabel = new JLabel();
     JPanel centralPanel = new JPanel();
-    Dimension buttoDimension = new Dimension(14,14);
     static JFrame toolFrame;
     static JTextArea results;
     static JScrollPane rightPanel;
-    // static boolean gridbool[] = new boolean[64*64];
+    // static boolean gridBool[] = new boolean[64*64];
 
     public gui() {
         super (new GridBagLayout());
@@ -72,12 +70,12 @@ class gui extends JPanel implements ActionListener {
         leftPanel.add(RBH64, l);
         leftPanel.setBorder(topPanel.getBorder());
         
-        centralPanel.setLayout(new GridLayout(gridrow, gridcol, 1, 1));
+        centralPanel.setLayout(new GridLayout(gridRow, gridCol, 1, 1));
         centralPanel.setBorder(topPanel.getBorder());
         
         makeGrid();
 
-        String resultsString = msg.replace("XX", Integer.toString(gridcol)).replace("YY", Integer.toString(gridrow)) + computeHex();
+        String resultsString = msg.replace("XX", Integer.toString(gridCol)).replace("YY", Integer.toString(gridRow)) + computeHex();
         results = new JTextArea(resultsString);
         
         rightPanel = new JScrollPane(results, JScrollPane.VERTICAL_SCROLLBAR_NEVER , JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -148,94 +146,80 @@ class gui extends JPanel implements ActionListener {
 
         String Source = e.getActionCommand();
 
-        switch (Source){
-
-            case "RBW8":
-            resizeGrid(8, gridrow);
-            break;
-            case "RBW16":
-            resizeGrid(16, gridrow);
-            break;
-            case "RBW32":
-            resizeGrid(32, gridrow);
-            break;
-            case "RBW64":
-            resizeGrid(64, gridrow);
-            break;
-            case "RBH8":
-            resizeGrid(gridcol, 8);
-            break;
-            case "RBH16": 
-            resizeGrid(gridcol, 16);
-            break;
-            case "RBH32": 
-            resizeGrid(gridcol, 32);
-            break;
-            case "RBH64": 
-            resizeGrid(gridcol, 64);
-            break;
-            case "Update":
-            results.setText(msg.replace("XX", Integer.toString(gridcol)).replace("YY", Integer.toString(gridrow)) + computeHex());
-            break;
-            case "Clear":
-            clearGrid();
-            break;
-            default:
-            break;
+        switch (Source) {
+            case "RBW8" -> resizeGrid(8, gridRow);
+            case "RBW16" -> resizeGrid(16, gridRow);
+            case "RBW32" -> resizeGrid(32, gridRow);
+            case "RBW64" -> resizeGrid(64, gridRow);
+            case "RBH8" -> resizeGrid(gridCol, 8);
+            case "RBH16" -> resizeGrid(gridCol, 16);
+            case "RBH32" -> resizeGrid(gridCol, 32);
+            case "RBH64" -> resizeGrid(gridCol, 64);
+            case "Update" -> updateGrid();
+            case "Clear" -> clearGrid();
+            default -> {
+            }
         }
 
-        centralPanel.setLayout(new GridLayout(gridrow,gridcol, 1, 1));
+        centralPanel.setLayout(new GridLayout(gridRow, gridCol, 1, 1));
         toolFrame.pack();
         // toolFrame.setMinimumSize(toolFrame.getSize());
     }
 
-    private void resizeGrid(int nW, int nH){
-        boolean gridbool[] = new boolean[64*64];
-        int tW; int tH;
-        int p;
-        for (int n = 0; n < gridcol*gridrow; n++){
-            if (c1[n].isSelected()){
-                tW = n%gridcol;
-                tH = n/gridcol;
-                p = (tH*nW) + tW;
-                // p = (((n/gridcol)*nW) + (n%gridcol));
-                if (tW >= nW) {
+    private void updateGrid(){
+        results.setText(msg.replace("XX", Integer.toString(gridCol))
+                .replace("YY", Integer.toString(gridRow))
+                + computeHex());
+    }
+
+    private void resizeGrid(int newWidth, int newHeight){
+        boolean[] gridBool = new boolean[64*64];
+        int tempWidth; int tempHeight;
+        int properIndex;
+        for (int n = 0; n < gridCol * gridRow; n++){
+            if (jToggleButtons[n].isSelected()){
+                tempWidth = n% gridCol;
+                tempHeight = n/ gridCol;
+                properIndex = (tempHeight*newWidth) + tempWidth;
+                // properIndex = (((n/gridCol)*newWidth) + (n%gridCol));
+                if (tempWidth >= newWidth) {
                     continue;
                 }
-                gridbool[p] = true; 
+                gridBool[properIndex] = true;
             }
         }
 
-        gridcol = nW;
-        gridrow = nH;
+        gridCol = newWidth;
+        gridRow = newHeight;
         centralPanel.removeAll();
-        for(int n = 0; n < nH*nW; n++){
-            c1[n] = new JToggleButton();
-            if (gridbool[n]){
-                c1[n].setSelected(true);
+        for(int n = 0; n < newHeight*newWidth; n++){
+            jToggleButtons[n] = new JToggleButton();
+            if (gridBool[n]){
+                jToggleButtons[n].setSelected(true);
             }
-            c1[n].setPreferredSize(buttoDimension);
-            centralPanel.add(c1[n]);
+            jToggleButtons[n].setPreferredSize(buttonDimension);
+            centralPanel.add(jToggleButtons[n]);
         }
     }
 
-    void clearGrid(){
-        for(int n = 0; n < gridcol*gridrow; n++){
-            c1[n].setSelected(false);
+    private void clearGrid(){
+        for(int n = 0; n < gridCol * gridRow; n++){
+            jToggleButtons[n].setSelected(false);
         }
+        updateGrid();
     }
     
-    void makeGrid(){
+    private void makeGrid(){
         centralPanel.removeAll();
-        for(int n = 0; n < gridcol*gridrow; n++){
-            c1[n] = new JToggleButton();
-            c1[n].setPreferredSize(buttoDimension);
-            centralPanel.add(c1[n]);
+        for(int n = 0; n < gridCol * gridRow; n++){
+            jToggleButtons[n] = new JToggleButton();
+            jToggleButtons[n].setPreferredSize(buttonDimension);
+            centralPanel.add(jToggleButtons[n]);
         }
     }
 
     private static void createAndShowGUI(){
-        toolFrame = new JFrame("Pixl Hexr");
+        toolFrame = new JFrame("Pixl-Hexr");
         toolFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         toolFrame.setResizable(true);
         JComponent newContentPane = new gui();
@@ -248,39 +232,33 @@ class gui extends JPanel implements ActionListener {
         toolFrame.setVisible(true);
     }
 
-    protected String computeHex(){
-        long compInt[] = new long[gridrow];
-        int ch; int cw; int cwi;
-        long addme;
-        for(int cn = 0; cn < gridcol*gridrow; cn++){
-            ch = cn/gridcol;
-            cw = cn%gridcol;
-            cwi = gridcol -(cw+1);
-            if(c1[cn].isSelected()){
-            addme = ((long)Math.pow(2, (cwi%4)))<<(4*(cwi/4));
-            compInt[ch] = compInt[ch] + addme;
-            // System.out.println("cwa = " + cwi);
-            // System.out.println("Makes 2^" + (cwi%4));
-            // System.out.println("Shifted "+4*(cwi/4)+" bits");
-            // System.out.println("Adds " + addme + " to CompInt[" + ch +"]" + " of " + compInt[ch]);
+    private String computeHex(){
+        long[] compInt = new long[gridRow];
+        int currentRow, currentCol, columnIndex;
+        long toAdd;
+        for(int currentNumber = 0; currentNumber < gridCol * gridRow; currentNumber++){
+            currentRow = currentNumber/ gridCol;
+            currentCol = currentNumber% gridCol;
+            columnIndex = gridCol -(currentCol+1);
+
+            if(jToggleButtons[currentNumber].isSelected()){
+            toAdd = ((long) Math.pow(2,(columnIndex%4)) ) << (4*(columnIndex/4));
+            compInt[currentRow] = compInt[currentRow] + toAdd;
             }
         }
 
-        String compresults;
+        String compResults;
         StringBuilder sb = new StringBuilder(1200);
-        String formatString = new String("%0" + Integer.toString(gridcol/4) + "x");
-        for(int n=0;n < gridrow;n++){
-            sb.append("0x" + String.format(formatString ,compInt[n]).toUpperCase() + ",\n");
+        String formatString = "%0" + gridCol /4 + "x";
+        for(int n = 0; n < gridRow; n++){
+            sb.append("0x").append(String.format(formatString, compInt[n]).toUpperCase()).append(",\n");
         }
         sb.append("};");
-        compresults = sb.toString();
-        return compresults;
+        compResults = sb.toString();
+        return compResults;
     }
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater (new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater (gui::createAndShowGUI
+        );
     }
 }
